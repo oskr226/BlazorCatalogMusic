@@ -1,0 +1,49 @@
+﻿<div class="row">
+    <div class="col-md-3">
+        <label>Name:</label>
+        <input type="text" @bind="song.Name" class="form-control" />
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-3">
+        <label>Upload:</label>
+        <InputFile OnChange="LoadSong" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <!--<button @onclick="UpdateValueSong">Update</button>-->
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public Song song { get; set; }
+
+    [Parameter]
+    public EventCallback<Song> OnSongChanged { get; set; }
+
+    //public async Task UpdateValueSong()
+    //{
+    //    await OnSongChanged.InvokeAsync(song);
+    //}
+
+    public async Task LoadSong(InputFileChangeEventArgs eventArgs)
+    {
+        var folderName = Path.Combine("wwwroot", "songs");
+        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+        var fullPath = Path.Combine(pathToSave, eventArgs.File.Name.Replace(" ", "-"));
+
+        song.Extension = Path.GetExtension(eventArgs.File.Name).Replace(".", "");
+        song.Path = eventArgs.File.Name.Replace(" ", "-");
+
+        using(var ms = new MemoryStream())
+        {
+            await eventArgs.File.OpenReadStream(Int32.MaxValue).CopyToAsync(ms);
+            await File.WriteAllBytesAsync(fullPath, ms.ToArray());
+        }
+
+        await OnSongChanged.InvokeAsync(song);
+    }
+}

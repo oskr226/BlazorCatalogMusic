@@ -1,0 +1,127 @@
+﻿@page "/albumadd"
+
+@inject NavigationManager _navigationManager;
+@inject IAlbumService _albumService;
+
+@if (album == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="album">        
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Title:</label>
+            </div>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="album.Title"></InputText>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Cover image:</label>
+            </div>
+            <div class="col-md-4">
+                <InputFile OnChange="LoadAlbumCover" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Description:</label>
+            </div>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="album.Description"></InputText>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Release date:</label>
+            </div>
+            <div class="col-md-4">
+                <InputDate class="form-control" @bind-Value="album.ReleaseDate"></InputDate>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Author:</label>
+            </div>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="album.Author"></InputText>
+            </div>
+        </div>
+        
+        <h3>Song <button class="btn btn-primary" @onclick="AddSong">+</button></h3>
+
+        @foreach (var song in album.Songs)
+        {
+            <SongComponent song="song" OnSongChanged="UpdateAddedSong"></SongComponent>
+        }
+
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <button class="btn btn-primary" @onclick="AlbumSave">Save</button>
+                <button class="btn btn-danger" @onclick="Cancel">Cancel</button>
+            </div>    
+        </div>
+    </EditForm>    
+}
+
+@code {
+    public Album album = new Album() { ReleaseDate = DateTime.Now, Songs = new List<Song>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            album.Songs.Add(new Song() { Number = album.Songs.Count + 1 });
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    public void AddSong()
+    {
+        album.Songs.Add(new Song() { Number = album.Songs.Count + 1 });
+    }
+
+    public async void UpdateAddedSong(Song song)
+    {
+        var songToUpdate = album.Songs.FirstOrDefault(s => s.Number == song.Number);
+
+        if (songToUpdate != null)
+        {
+            songToUpdate.Extension = song.Extension;
+            songToUpdate.Name = song.Name;
+            songToUpdate.Path = song.Path;
+        }
+    }
+
+    public async Task LoadAlbumCover(InputFileChangeEventArgs inputFile)
+    {
+        var format = "image/png";
+        var resizedFile = await inputFile.File.RequestImageFileAsync(format, 200, 200);
+        var buffer = new byte[resizedFile.Size];
+
+        await resizedFile.OpenReadStream().ReadAsync(buffer);
+
+        album.CoverImage = buffer;
+    }
+
+    public async Task AlbumSave()
+    {
+        await _albumService.InsertAlbum(album);
+    }
+
+    public void Cancel()
+    {
+        NavigationHome();
+    }
+
+    public void NavigationHome()
+    {
+        _navigationManager.NavigateTo("/");
+    }
+}
