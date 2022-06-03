@@ -1,0 +1,42 @@
+﻿@page "/albumview/{id:int}"
+
+@inject IAlbumService _albumService;
+
+@if(album == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            
+        </div>
+        <div class="col-md-4">
+            <div>
+                <img src="data:image/png;base64,@(Convert.ToBase64String(album.CoverImage))" />
+                <h1>@album.Title</h1>
+            </div>
+        </div>
+        <div class="col-md-4">
+            
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    Album album;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            album = await _albumService.GetAlbum(id);
+        }
+    }
+
+    
+}
