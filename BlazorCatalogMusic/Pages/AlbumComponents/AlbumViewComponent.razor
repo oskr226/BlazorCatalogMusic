@@ -2,13 +2,9 @@
 
 @inject IAlbumService _albumService;
 
-@if(album == null)
+@if(album != null && album.Songs != null)
 {
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="row">
+    <div class="row mb-5">
         <div class="col-md-4">
             
         </div>
@@ -22,6 +18,22 @@ else
             
         </div>
     </div>
+    
+    @foreach(var song in album.Songs)
+    {
+        <div class="row offset-1">
+            <div class="col-md-4">
+                <span>@song.Name</span>
+            </div>
+            <div class="col-md-4">
+                <audio id="@song.Id" controls="controls" src="/songs/@song.Path"></audio>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p><em>Loading...</em></p>    
 }
 
 @code {

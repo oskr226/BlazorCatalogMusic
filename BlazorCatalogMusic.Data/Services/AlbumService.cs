@@ -30,9 +30,9 @@ namespace BlazorCatalogMusic.Data.Services
             return album;
         }
 
-        public Task<IEnumerable<Album>> GetAlbums()
+        public async Task<IEnumerable<Album>> GetAlbums()
         {
-            throw new NotImplementedException();
+            return await _albumCatalogContext.Albums.ToListAsync();
         }
 
         public async Task<bool> InsertAlbum(Album album)
