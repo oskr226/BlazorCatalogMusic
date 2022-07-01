@@ -26,8 +26,10 @@ else
                             <img src="data:image/png;base64,@(Convert.ToBase64String(album.CoverImage))" />
                         </a>
                         <div>
-                            <h6><a href="/albumview/@album.Id">@album.Title</a></h6>
-                            <span>@album.Author</span>
+                            <h6><a href="/albumview/@album.Id">@album.Title - @album.Author</a></h6>
+                        </div>
+                        <div>
+                            <a href="/albumadd/@album.Id">Edit</a>
                         </div>
                     </div>
                 </div>

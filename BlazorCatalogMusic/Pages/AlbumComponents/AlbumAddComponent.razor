@@ -1,4 +1,5 @@
 ﻿@page "/albumadd"
+@page "/albumadd/{id:int}"
 
 @inject NavigationManager _navigationManager;
 @inject IAlbumService _albumService;
@@ -55,7 +56,7 @@ else
 
         @foreach (var song in album.Songs)
         {
-            <SongComponent song="song" OnSongChanged="UpdateAddedSong"></SongComponent>
+            <SongComponent song="song" OnSongChanged="UpdateAddedSong"></SongComponent>            
         }
 
         <div class="row mt-3">
@@ -68,13 +69,25 @@ else
 }
 
 @code {
-    public Album album = new Album() { ReleaseDate = DateTime.Now, Songs = new List<Song>() };
+    [Parameter]
+    public int id { get; set; }
+
+    public Album album;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            album.Songs.Add(new Song() { Number = album.Songs.Count + 1 });
+            if(id > 0)
+            {
+                album = await _albumService.GetAlbum(id);
+            }
+            else
+            {
+                album = new Album() { ReleaseDate = DateTime.Now, Songs = new List<Song>() };
+
+                album.Songs.Add(new Song() { Number = album.Songs.Count + 1 });
+            }            
         }
         catch (Exception ex)
         {
@@ -112,7 +125,23 @@ else
 
     public async Task AlbumSave()
     {
-        await _albumService.InsertAlbum(album);
+        try
+        {
+            if (id > 0)
+            {
+                await _albumService.UpdateAlbum(album);
+            }
+            else
+            {
+                await _albumService.InsertAlbum(album);
+            }
+
+            NavigationHome();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     public void Cancel()
