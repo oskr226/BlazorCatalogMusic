@@ -56,13 +56,17 @@ else
 
         @foreach (var song in album.Songs)
         {
-            <SongComponent song="song" OnSongChanged="UpdateAddedSong"></SongComponent>            
+            <SongComponent song="song" OnSongChanged="UpdateAddedSong" OnSongRemoved="RemoveSong"></SongComponent>            
         }
 
         <div class="row mt-3">
             <div class="col-md-4">
                 <button class="btn btn-primary" @onclick="AlbumSave">Save</button>
-                <button class="btn btn-danger" @onclick="Cancel">Cancel</button>
+                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                @if(id > 0)
+                {
+                    <button class="btn btn-danger" @onclick="DeleteAlbum">Remove album</button>
+                }                
             </div>    
         </div>
     </EditForm>    
@@ -100,7 +104,13 @@ else
         album.Songs.Add(new Song() { Number = album.Songs.Count + 1 });
     }
 
-    public async void UpdateAddedSong(Song song)
+    public async Task DeleteAlbum()
+    {
+        await _albumService.DeleteAlbum(album);
+        NavigationHome();
+    }
+
+    public void UpdateAddedSong(Song song)
     {
         var songToUpdate = album.Songs.FirstOrDefault(s => s.Number == song.Number);
 
@@ -110,6 +120,13 @@ else
             songToUpdate.Name = song.Name;
             songToUpdate.Path = song.Path;
         }
+    }
+
+    public void RemoveSong(Song song)
+    {
+        var songToRemove = album.Songs.FirstOrDefault(s => s.Number == song.Number);
+
+        album.Songs.Remove(songToRemove);
     }
 
     public async Task LoadAlbumCover(InputFileChangeEventArgs inputFile)

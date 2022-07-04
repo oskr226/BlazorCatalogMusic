@@ -10,6 +10,6 @@ namespace BlazorCatalogMusic.Data.Services.IServices
         Task<Album> GetAlbum(int id);
         Task<bool> InsertAlbum(Album album);
         Task<bool> UpdateAlbum(Album album);
-        Task DeleteAlbum(Album album);
+        Task<bool> DeleteAlbum(Album album);
     }
 }

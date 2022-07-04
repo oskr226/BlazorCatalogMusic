@@ -18,9 +18,12 @@ namespace BlazorCatalogMusic.Data.Services
             _albumCatalogContext = albumCatalogContext;
         }
 
-        public Task DeleteAlbum(Album album)
+        public async Task<bool> DeleteAlbum(Album album)
         {
-            throw new NotImplementedException();
+            _albumCatalogContext.Albums.Remove(album);
+            _albumCatalogContext.Songs.RemoveRange(album.Songs);
+
+            return await _albumCatalogContext.SaveChangesAsync() > 0;
         }
 
         public async Task<Album> GetAlbum(int id)
