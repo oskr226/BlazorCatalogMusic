@@ -35,6 +35,7 @@ namespace BlazorCatalogMusic
             services.AddDbContext<AlbumCatalogContext>();
 
             services.AddScoped<IAlbumService, AlbumService>();
+            services.AddScoped<WeatherForecastService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
